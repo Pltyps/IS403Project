@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - QueryKitchen</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Lobster&family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #FFFFFF;
+            color: #333333;
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            background-color: #F4F4F4;
+            border-radius: 10px;
+        }
+
+        .navbar-brand, .nav-link {
+            color: #333333 !important;
+        }
+
+        .navbar-brand:hover, .nav-link:hover {
+            color: #A7C6ED !important;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 40px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #333333;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            color: #8A9BB3;
+        }
+
+        section {
+            margin-top: 40px;
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .recipe-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .recipe-item {
+            background-color: #f4f4f4;
+            padding: 20px;
+            width: 280px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .recipe-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .recipe-item h3 {
+            font-size: 1.5em;
+            color: #007BFF;
+            margin: 0;
+            text-align: center;
+        }
+
+        .recipe-item p {
+            color: #555;
+            font-size: 1em;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .no-favorites {
+            text-align: center;
+            font-size: 1.2em;
+            color: #888;
+        }
+
+        .footer {
+            background-color: #F4F4F4;
+            color: #333333;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        .footer a {
+            color: #333333;
+        }
+
+        .footer a:hover {
+            color: #A7C6ED;
+        }
+
+        @media (max-width: 768px) {
+            .recipe-item {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">QueryKitchen</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="recipes.html">Healthy Recipes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="login.html">Login</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Section -->
+    <div class="dashboard-container">
+        <header>
+            <h1>Welcome to QueryKitchen, <%= user.username %>!</h1>
+            <p>Email: <%= user.email %></p>
+        </header>
+
+        <section>
+            <h2>Your Favorite Recipes</h2>
+            <% if (favoriteRecipes.length === 0) { %>
+                <p class="no-favorites">You don't have any favorite recipes yet.</p>
+            <% } else { %>
+                <div class="recipe-list">
+                    <% favoriteRecipes.forEach(function(recipe) { %>
+                        <div class="recipe-item">
+                            <h3><%= recipe.name %></h3>
+                            <p><%= recipe.description %></p>
+                        </div>
+                    <% }) %>
+                </div>
+            <% } %>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container text-center">
+            <p>&copy; 2024 QueryKitchen | <a href="#">Privacy Policy</a></p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+</body>
+</html>
