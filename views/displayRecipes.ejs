@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipes</title>
+</head>
+<body>
+  <h1>Display Recipes</h1>
+
+  <!-- Filter Form -->
+  <form action="/recipes/filter" method="POST">
+    <h3>Filter Recipes</h3>
+    <label>
+      <input type="checkbox" name="filters[]" value="Vegetarian"> Vegetarian
+    </label><br>
+    <label>
+      <input type="checkbox" name="filters[]" value="Vegan"> Vegan
+    </label><br>
+    <label>
+      <input type="checkbox" name="filters[]" value="Gluten-Free"> Gluten-Free
+    </label><br>
+    <button type="submit">Apply Filters</button>
+  </form>
+
+  <!-- Display Recipes -->
+  <h3>Recipes</h3>
+  <ul>
+    <% recipes.forEach(recipe => { %>
+      <li>
+        <h4><%= recipe.name %></h4>
+        <p><%= recipe.description %></p>
+        <p><strong>Category:</strong> <%= recipe.category %></p>
+      </li>
+    <% }) %>
+  </ul>
+</body>
+</html>
