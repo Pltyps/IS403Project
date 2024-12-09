@@ -1,29 +1,77 @@
-// Route for displaying recipes
-app.get('/recipes', async (req, res) => {
+const express = require('express');
+const knex = require('knex');
+const path = require('path');
+
+// Initialize the Express app
+const app = express();
+const bcrypt = require('bcrypt');
+
+// Middleware to parse JSON and URL-encoded data
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Set up the view engine and views directory
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+// Static files middleware (for styles and scripts, if needed)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Initialize Knex with PostgreSQL configuration
+const db = knex({
+    client: 'pg',
+    connection: {
+        host: 'localhost',
+        user: 'pg',
+        password: process.env.DB_PASSWORD || 'your_secure_password', // Use environment variable
+        database: 'your_pg_database',
+    },
+});
+
+// Home route
+app.get('/', (req, res) => {
+    res.render('index', {
+        homeUrl: '/',
+        recipesUrl: '/recipes',
+        loginUrl: '/login',
+        privacyUrl: '/privacy',
+    });
+});
+
+// Login route (GET)
+app.get('/login', (req, res) => {
+    res.render('login', {
+        loginAction: '/login',
+        homeUrl: '/',
+        recipesUrl: '/recipes',
+        signupUrl: '/signup',
+        privacyUrl: '/privacy',
+        loginUrl: '/login'  // Pass the login URL correctly
+    });
+});
+
+// Login route (POST)
+app.post('/login', async (req, res) => {
+    const { username, password } = req.body;
     try {
-      // Fetch recipes from the database (replace with your actual database query)
-      const recipes = await knex('recipes_table').select('*');
-  
-      // Render the recipes page and pass the data
-      res.render('displayRecipes', { recipes });
+        // Replace the query below with your actual user authentication logic
+        const user = await db('users')
+            .where({ username }) // Check username
+            .first();
+
+        if (user && await bcrypt.compare(password, user.password)) {
+            res.redirect('/');
+        } else {
+            res.status(401).send('Invalid credentials');
+        }
     } catch (error) {
-      console.error(error);
-      res.status(500).send('Error fetching recipes');
+        console.error('Error authenticating user:', error);
+        res.status(500).send('An error occurred');
     }
-  });
-  
-  // Route for filtering recipes
-  app.post('/recipes/filter', async (req, res) => {
-    const { filters } = req.body; // Get selected filters from the checkboxes
-    try {
-      // Query recipes based on selected filters
-      const filteredRecipes = await knex('recipes_table')
-        .select('*')
-        .whereIn('category', filters); // Adjust the column name 'category' as per your database
-  
-      res.render('displayRecipes', { recipes: filteredRecipes });
-    } catch (error) {
-      console.error(error);
-      res.status(500).send('Error filtering recipes');
-    }
-  });
+});
+
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+});
