@@ -1,38 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Recipes</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipes</title>
+    <script>
+        // Function to toggle favorites
+        async function toggleFavorite(recipeId, isFavorite) {
+            try {
+                const response = await fetch("/favorites/toggle", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        userid: 1, // Replace with the actual logged-in user's ID
+                        recipeid: recipeId,
+                        isFavorite: isFavorite
+                    }),
+                });
+
+                if (!response.ok) {
+                    alert("Failed to update favorite status");
+                }
+            } catch (error) {
+                console.error("Error toggling favorite:", error);
+            }
+        }
+    </script>
 </head>
 <body>
-  <h1>Display Recipes</h1>
+    <h1>Recipes</h1>
 
-  <!-- Filter Form -->
-  <form action="/recipes/filter" method="POST">
-    <h3>Filter Recipes</h3>
-    <label>
-      <input type="checkbox" name="filters[]" value="Vegetarian"> Vegetarian
-    </label><br>
-    <label>
-      <input type="checkbox" name="filters[]" value="Vegan"> Vegan
-    </label><br>
-    <label>
-      <input type="checkbox" name="filters[]" value="Gluten-Free"> Gluten-Free
-    </label><br>
-    <button type="submit">Apply Filters</button>
-  </form>
+    <!-- Dropdown for categories -->
+    <form action="/recipes" method="GET">
+        <label for="category">Filter by Category:</label>
+        <select name="category" id="category" onchange="this.form.submit()">
+            <option value="">All Categories</option>
+            <% categories.forEach(category => { %>
+                <option value="<%= category.categoryid %>" <%= category.categoryid == selectedCategory ? 'selected' : '' %>>
+                    <%= category.catname %>
+                </option>
+            <% }); %>
+        </select>
+    </form>
 
-  <!-- Display Recipes -->
-  <h3>Recipes</h3>
-  <ul>
-    <% recipes.forEach(recipe => { %>
-      <li>
-        <h4><%= recipe.name %></h4>
-        <p><%= recipe.description %></p>
-        <p><strong>Category:</strong> <%= recipe.category %></p>
-      </li>
-    <% }) %>
-  </ul>
+    <ul>
+        <% recipes.forEach(recipe => { %>
+            <li>
+                <h2><%= recipe.recipename %></h2>
+                <p><strong>Category:</strong> <%= recipe.category_name %></p>
+                <p><strong>Description:</strong> <%= recipe.description %></p>
+                <p><strong>Cook Time:</strong> <%= recipe.cooktime %></p>
+                <p><strong>Prep Time:</strong> <%= recipe.preptime %></p>
+                <p><strong>Servings:</strong> <%= recipe.servings %></p>
+
+                <h3>Ingredients:</h3>
+                <ul>
+                    <% recipe.ingredients.forEach(ingredient => { %>
+                        <li>
+                            <%= ingredient.amount %> <%= ingredient.unit_name %> of <%= ingredient.ingredient_name %>
+                        </li>
+                    <% }); %>
+                </ul>
+
+                <h3>Instructions:</h3>
+                <ol>
+                    <% recipe.instructions.forEach(instruction => { %>
+                        <li>
+                            <%= instruction.instdesc %>
+                        </li>
+                    <% }); %>
+                </ol>
+
+                <!-- Checkbox for marking/unmarking favorite -->
+                <label>
+                    <input 
+                        type="checkbox" 
+                        <% if (recipe.isFavorite) { %> checked <% } %>
+                        onchange="toggleFavorite(<%= recipe.recipeid %>, <%= recipe.isFavorite ? 'true' : 'false' %>)"
+                    >
+                    Favorite
+                </label>
+            </li>
+        <% }); %>
+    </ul>
 </body>
 </html>
