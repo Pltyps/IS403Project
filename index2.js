@@ -15,7 +15,7 @@ const knex = require("knex")({
     connection: {
         host: "localhost",
         user: "postgres",
-        password: "0000",
+        password: "6639",
         database: "newnew",
     },
 });
@@ -24,9 +24,6 @@ const knex = require("knex")({
 app.get("/recipes", async (req, res) => {
     try {
         const { category } = req.query;
-
-        // Log the received category query parameter
-        console.log("Selected category:", category);
 
         // Fetch all categories
         const categories = await knex("category").select("categoryid", "catname");
@@ -62,14 +59,13 @@ app.get("/recipes", async (req, res) => {
         // Fetch ingredients and instructions for all recipes
         const recipeDetails = await Promise.all(
             recipes.map(async (recipe) => {
-                // Updated query to fetch ingredients
                 const ingredients = await knex("recipeingredients")
                     .join("ingredients", "recipeingredients.ingredientid", "ingredients.ingredientid")
-                    .join("units", "recipeingredients.unit", "units.unitid") // Updated column name
+                    .join("units", "recipeingredients.unit", "units.unitid")
                     .select(
-                        "ingredients.ingname as ingredient_name", // Updated column name
+                        "ingredients.ingname as ingredient_name",
                         "recipeingredients.amount",
-                        "units.unname as unit_name" // Updated column name
+                        "units.unname as unit_name"
                     )
                     .where("recipeingredients.recipeid", recipe.recipeid);
                 console.log(`Ingredients for recipe ${recipe.recipeid}:`, ingredients);
@@ -83,7 +79,7 @@ app.get("/recipes", async (req, res) => {
                     ...recipe,
                     ingredients,
                     instructions,
-                    isFavorite: favoriteIds.has(recipe.recipeid), // Check if the recipe is a favorite
+                    isFavorite: favoriteIds.has(recipe.recipeid),
                 };
             })
         );
@@ -117,6 +113,27 @@ app.post("/favorites/toggle", async (req, res) => {
         console.error("Error updating favorites:", error.stack);
         res.status(500).send("Error updating favorites");
     }
+});
+
+// Route to display favorites page
+app.get("/favorites", async (req, res) => {
+    try {
+        const userId = 1; // Replace with dynamic user ID when authentication is implemented
+        const favoriteRecipes = await knex("userfavs")
+            .join("recipes", "userfavs.recipeid", "recipes.recipeid")
+            .select("recipes.recipename as name", "recipes.description as description")
+            .where("userfavs.userid", userId);
+
+        res.render("favorites", { favoriteRecipes });
+    } catch (error) {
+        console.error("Error fetching favorites:", error.stack);
+        res.status(500).send("Error fetching favorites");
+    }
+});
+
+// Route to render the home page
+app.get("/", (req, res) => {
+    res.render("index");
 });
 
 // Start the server
